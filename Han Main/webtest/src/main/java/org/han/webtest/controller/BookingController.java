@@ -37,9 +37,14 @@ public class BookingController {
 
         Optional<ClassScheduleModel> scheduleOpt = classScheduleRepository.findById(classId);
         if (scheduleOpt.isPresent()) {
+            ClassScheduleModel schedule = scheduleOpt.get();
+            if (classBookingRepository.existsByUserAndScheduleAndStatusNot(user, schedule, "REJECTED")) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Kamu sudah membooking kelas ini dan statusnya masih aktif!"));
+            }
+
             ClassBookingModel booking = new ClassBookingModel();
             booking.setUser(user);
-            booking.setSchedule(scheduleOpt.get());
+            booking.setSchedule(schedule);
             booking.setBookingDate(LocalDate.now());
             booking.setStatus("PENDING");
             classBookingRepository.save(booking);
@@ -57,6 +62,7 @@ public class BookingController {
 
         List<ClassBookingModel> bookings = classBookingRepository.findAll().stream()
                 .filter(b -> b.getUser().getId() == user.getId())
+                .filter(b -> !b.getStatus().equals("REJECTED"))
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> bookedClasses = bookings.stream().map(b -> {
