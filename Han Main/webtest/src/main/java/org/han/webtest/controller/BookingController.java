@@ -67,6 +67,7 @@ public class BookingController {
 
         List<Map<String, Object>> bookedClasses = bookings.stream().map(b -> {
             Map<String, Object> map = new HashMap<>();
+            map.put("id", b.getId());
             map.put("serviceName", b.getSchedule().getServiceName());
             map.put("dayOfWeek", b.getSchedule().getDayOfWeek());
             map.put("startTime", b.getSchedule().getStartTime().toString());
@@ -78,5 +79,19 @@ public class BookingController {
         Map<String, Object> response = new HashMap<>();
         response.put("bookedClasses", bookedClasses);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/api/bookings/{id}")
+    public ResponseEntity<?> deleteBooking(@PathVariable Long id, HttpServletRequest req) {
+        UserModel user = (UserModel) req.getAttribute("user");
+
+        Optional<ClassBookingModel> booking = classBookingRepository.findById(id);
+
+        if (booking.isPresent() && booking.get().getUser().getId() == user.getId()) {
+            classBookingRepository.deleteById(id);
+            return ResponseEntity.ok(Map.of("message", "Booking berhasil dibatalkan"));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of("message", "Gagal membatalkan booking, data tidak ditemukan atau bukan milikmu"));
     }
 }

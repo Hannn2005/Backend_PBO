@@ -37,12 +37,16 @@ public class ClassController {
     public ResponseEntity<?> bookClass(@PathVariable Long scheduleId, @RequestBody Map<String, String> payload, HttpServletRequest req) {
         try {
             UserModel user = (UserModel) req.getAttribute("user");
-            LocalDate bookingDate = LocalDate.parse(payload.get("bookingDate")); // Format dari React harus YYYY-MM-DD
 
-            ClassBookingModel booking = classService.bookClass(user.getId(), scheduleId, bookingDate);
-            return ResponseEntity.ok(booking);
+            LocalDate bookingDate = payload.containsKey("bookingDate")
+                    ? LocalDate.parse(payload.get("bookingDate"))
+                    : LocalDate.now();
+
+            classService.bookClass(user.getId(), scheduleId, bookingDate);
+
+            return ResponseEntity.ok(Map.of("message", "Booking berhasil disubmit!"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 

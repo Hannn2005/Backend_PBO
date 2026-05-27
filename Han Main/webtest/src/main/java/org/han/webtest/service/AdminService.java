@@ -18,7 +18,7 @@ public class AdminService {
     public List<UserDashboardResponse> getAllUser(){
         return userRepository.findAll().stream().map
                 (user-> new UserDashboardResponse
-                        (user.getId(), user.getEmail(), user.getUsername(), user.getRole()))
+                        (user.getId(), user.getUsername(), user.getEmail(), user.getRole()))
                 .toList();
     }
 }

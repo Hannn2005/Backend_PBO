@@ -39,11 +39,32 @@ public class ClassService {
         ClassScheduleModel schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException("Schedule not found"));
 
+        if (bookingRepository.existsByUserAndScheduleAndStatusNot(user, schedule, "REJECTED")) {
+            throw new RuntimeException("Kamu sudah membooking kelas ini dan statusnya masih aktif!");
+        }
+
         ClassBookingModel booking = new ClassBookingModel(user, schedule, bookingDate, "PENDING");
         return bookingRepository.save(booking);
     }
 
     public List<ClassBookingModel> getUserBookings(Long userId) {
         return bookingRepository.findByUserId(userId);
+    }
+
+
+    public ClassScheduleModel createSchedule(ClassScheduleModel newClass) {
+        return scheduleRepository.save(newClass);
+    }
+
+    public void deleteSchedule(Long scheduleId) {
+        // 1. Cari dulu jadwalnya
+        ClassScheduleModel schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+
+        List<ClassBookingModel> relatedBookings = bookingRepository.findAll().stream()
+                .filter(b -> b.getSchedule().getId() == scheduleId)
+                .toList();
+        bookingRepository.deleteAll(relatedBookings);
+        scheduleRepository.delete(schedule);
     }
 }
