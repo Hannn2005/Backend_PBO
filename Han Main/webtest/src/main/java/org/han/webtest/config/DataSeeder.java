@@ -1,10 +1,8 @@
 package org.han.webtest.config;
 
 import org.han.webtest.model.ClassScheduleModel;
-import org.han.webtest.model.MembershipPlanModel;
 import org.han.webtest.model.UserModel;
 import org.han.webtest.repository.ClassScheduleRepository;
-import org.han.webtest.repository.MembershipPlanRepository;
 import org.han.webtest.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,16 +13,13 @@ import java.time.LocalTime;
 @Component
 public class DataSeeder implements CommandLineRunner {
 
-    private final MembershipPlanRepository planRepository;
     private final ClassScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataSeeder(MembershipPlanRepository planRepository,
-                      ClassScheduleRepository scheduleRepository,
+    public DataSeeder( ClassScheduleRepository scheduleRepository,
                       UserRepository userRepository,
                       PasswordEncoder passwordEncoder) {
-        this.planRepository = planRepository;
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -43,27 +38,7 @@ public class DataSeeder implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        if (planRepository.count() == 0) {
-            MembershipPlanModel basic = new MembershipPlanModel(
-                    "Basic",
-                    150000.0,
-                    "Akses gym reguler, 1x konsultasi pelatih, Locker umum"
-            );
-            MembershipPlanModel premium = new MembershipPlanModel(
-                    "Premium",
-                    300000.0,
-                    "Akses gym penuh, 4x sesi personal trainer, Akses kelas group, Locker pribadi"
-            );
-            MembershipPlanModel elite = new MembershipPlanModel(
-                    "Elite",
-                    500000.0,
-                    "Akses 24 jam, 8x sesi personal trainer, Body assessment bulanan, Free merchandise"
-            );
 
-            planRepository.save(basic);
-            planRepository.save(premium);
-            planRepository.save(elite);
-        }
 
         if (scheduleRepository.count() == 0) {
             ClassScheduleModel zumba = new ClassScheduleModel(

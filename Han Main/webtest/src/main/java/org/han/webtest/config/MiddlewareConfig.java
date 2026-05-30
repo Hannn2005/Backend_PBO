@@ -35,7 +35,9 @@ public class MiddlewareConfig extends OncePerRequestFilter {
 
         if (path.startsWith("/user/login") ||
                 path.startsWith("/user/signup") ||
-                path.startsWith("/api/classes")) {
+                path.startsWith("/api/classes") ||
+                path.startsWith("/h2-console")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
